@@ -3,6 +3,7 @@ package parabank
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import parabank.Data._
+import scala.concurrent.duration._
 
 class LoginTest extends Simulation{
 
