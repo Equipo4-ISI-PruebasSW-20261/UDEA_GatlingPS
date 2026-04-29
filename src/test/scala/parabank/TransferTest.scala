@@ -12,9 +12,13 @@ class TransferTest extends Simulation{
     //Verificar de forma general para todas las solicitudes
     .check(status.is(200))
 
+      // Feeder CSV para datos de transferencias
+  val transferFeeder = csv("transfers.csv").circular
+
     // 2 Scenario Definition
-  val scn = scenario("Transfer Test").
-    exec(http("Transfer Request")
+  val scn = scenario("Transfer Test")
+  .feed(transferFeeder)
+  .exec(http("Transfer Request")
         .post(s"/transfer?fromAccountId=$fromAccountId&toAccountId=$toAccountId&amount=$amount")
          .check(status.is(200))
          )
