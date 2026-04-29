@@ -19,8 +19,11 @@ class TransferTest extends Simulation{
   val scn = scenario("Transfer Test")
   .feed(transferFeeder)
   .exec(http("Transfer Request")
-        .post(s"/transfer?fromAccountId=$fromAccountId&toAccountId=$toAccountId&amount=$amount")
-         .check(status.is(200))
+      .post("/transfer")
+      .queryParam("fromAccountId", "${fromAccountId}")
+      .queryParam("toAccountId", "${toAccountId}")
+      .queryParam("amount", "${amount}")
+      .check(status.is(200))
          )
 
     // 3 Load Scenario
