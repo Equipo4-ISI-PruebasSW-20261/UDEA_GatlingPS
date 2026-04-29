@@ -14,14 +14,14 @@ class LoginTest extends Simulation{
     .check(status.is(200))
 
   // 2 Scenario Definition
-  val scn100 = scenario("Login").
+  val scn100 = scenario("Login Test - Carga Normal").
     exec(http("login")
       .get(s"/login/$username/$password")
        //Recibir información de la cuenta
       .check(status.is(200))
     )
 
-  val scn200 = scenario("Login").
+  val scn200 = scenario("Login Test - Carga Pico").
     exec(http("login")
       .get(s"/login/$username/$password")
        //Recibir información de la cuenta
