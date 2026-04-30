@@ -5,48 +5,44 @@ import io.gatling.http.Predef._
 import parabank.Data._
 import scala.concurrent.duration._
 
-class LoginTest extends Simulation{
+class LoginTest extends Simulation {
 
   // 1 Http Conf
   val httpConf = http.baseUrl(url)
     .acceptHeader("application/json")
-    //Verificar de forma general para todas las solicitudes
-    .check(status.is(200))
 
   // 2 Scenario Definition
-  val scn100 = scenario("Login Test - Carga Normal").
-    exec(http("login")
-      .get(s"/login/$username/$password")
-       //Recibir información de la cuenta
-      .check(status.is(200))
+  // Carga normal: 100 usuarios concurrentes
+  val scnNormal = scenario("Login Test - Carga Normal")
+    .exec(
+      http("Login Carga Normal")
+        .get(s"/login/$username/$password")
+        .check(status.is(200))
     )
 
-  val scn200 = scenario("Login Test - Carga Pico").
-    exec(http("login")
-      .get(s"/login/$username/$password")
-       //Recibir información de la cuenta
-      .check(status.is(200))
+  // Carga pico: 200 usuarios concurrentes
+  val scnPico = scenario("Login Test - Carga Pico")
+    .exec(
+      http("Login Carga Pico")
+        .get(s"/login/$username/$password")
+        .check(status.is(200))
     )
-
-  val cargaNormal = scn100.inject(
-    rampUsers(100).during(10.seconds)
-  )
-
-  val cargaPico = scn200.inject(
-    rampUsers(200).during(20.seconds)
-  )
 
   // 3 Load Scenario
+  // Ejecutar secuencialmente: primero carga normal, luego carga pico
   setUp(
-    cargaNormal,
-    cargaPico
+    scnNormal.inject(rampUsers(100).during(30.seconds)),
+    scnPico.inject(
+      nothingFor(60.seconds),          // esperar que carga normal termine
+      rampUsers(200).during(30.seconds) // carga pico después
+    )
   ).protocols(httpConf)
    .assertions(
-      // Tiempo medio ≤ 2s bajo carga normal
-      global.responseTime.mean.lte(2000),
-      // Tiempo máx ≤ 5s bajo carga pico
-      global.responseTime.max.lte(5000),
-      // Menos del 1% de errores
-      global.failedRequests.percent.lte(1)
+     // Historia 1: ≤ 2 segundos con 100 usuarios concurrentes (carga normal)
+     details("Login Carga Normal").responseTime.max.lte(2000),
+     // Historia 1: ≤ 5 segundos con 200 usuarios concurrentes (carga pico)
+     details("Login Carga Pico").responseTime.max.lte(5000),
+     // Tasa de error global ≤ 1%
+     global.failedRequests.percent.lte(1)
    )
 }
