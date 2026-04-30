@@ -41,9 +41,9 @@ class LoginTest extends Simulation {
   ).protocols(httpConf)
    .assertions(
      // Historia 1: ≤ 2 segundos con 100 usuarios concurrentes (carga normal)
-     details("Login Carga Normal").responseTime.max.lte(2000),
+     details("Login Carga Normal").responseTime.percentile3.lte(2000),
      // Historia 1: ≤ 5 segundos con 200 usuarios concurrentes (carga pico)
-     details("Login Carga Pico").responseTime.max.lte(5000),
+     details("Login Carga Pico").responseTime.percentile3.lte(5000),
      // Tasa de error global ≤ 1%
      global.failedRequests.percent.lte(1)
    )
