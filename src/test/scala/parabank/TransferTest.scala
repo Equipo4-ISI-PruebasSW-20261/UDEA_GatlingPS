@@ -37,7 +37,7 @@ class TransferTest extends Simulation {
     )
   ).protocols(httpConf)
    .assertions(
-     // No deben perderse transacciones ni ocurrir fallos
+     // No deben perderse más del 1% de transacciones
      global.failedRequests.percent.lte(1),
      global.successfulRequests.percent.gte(99)
    )
