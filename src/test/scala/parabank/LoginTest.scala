@@ -37,7 +37,7 @@ class LoginTest extends Simulation {
     .andThen(
       scnPico.inject(constantConcurrentUsers(200).during(30.seconds))
     )
-  ).protocols(httpConf)
+).protocols(httpConf)
    .assertions(
      // Historia 1: ≤ 2 segundos con 100 usuarios concurrentes (carga normal)
      details("Login Carga Normal").responseTime.percentile(95).lte(2000),
