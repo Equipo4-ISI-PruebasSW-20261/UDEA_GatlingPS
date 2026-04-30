@@ -5,6 +5,8 @@ import io.gatling.http.Predef._
 import parabank.Data._
 import scala.concurrent.duration._
 
+// Historia de Usuario No Funcional 1: Tiempo de respuesta en login
+// Criterios: ≤ 2s con 100 usuarios | ≤ 5s con 200 usuarios (carga pico)
 class LoginTest extends Simulation {
 
   // 1 Http Conf
@@ -31,17 +33,17 @@ class LoginTest extends Simulation {
   // 3 Load Scenario
   // Ejecutar secuencialmente: primero carga normal, luego carga pico
   setUp(
-    scnNormal.inject(constantConcurrentUsers(100).during(30.seconds)),
+    scnNormal.inject(rampUsers(100).during(30.seconds)),
     scnPico.inject(
       nothingFor(40.seconds),          // esperar que carga normal termine
-      constantConcurrentUsers(200).during(30.seconds) // carga pico después
+      rampUsers(200).during(30.seconds) // carga pico después
     )
   ).protocols(httpConf)
    .assertions(
      // Historia 1: ≤ 2 segundos con 100 usuarios concurrentes (carga normal)
-     details("Login Carga Normal").responseTime.percentile3.lte(2000),
+     details("Login Carga Normal").responseTime.max.lte(2000),
      // Historia 1: ≤ 5 segundos con 200 usuarios concurrentes (carga pico)
-     details("Login Carga Pico").responseTime.percentile3.lte(5000),
+     details("Login Carga Pico").responseTime.max.lte(5000),
      // Tasa de error global ≤ 1%
      global.failedRequests.percent.lte(1)
    )
