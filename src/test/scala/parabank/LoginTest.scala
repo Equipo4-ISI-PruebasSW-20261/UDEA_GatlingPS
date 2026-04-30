@@ -33,10 +33,10 @@ class LoginTest extends Simulation {
   // 3 Load Scenario
   // Ejecutar secuencialmente: primero carga normal, luego carga pico
   setUp(
-    scnNormal.inject(rampUsers(100).during(30.seconds)),
+    scnNormal.inject(constantUsersPerSec(100).during(30.seconds)),
     scnPico.inject(
       nothingFor(40.seconds),          // esperar que carga normal termine
-      rampUsers(200).during(30.seconds) // carga pico después
+      constantUsersPerSec(200).during(30.seconds) // carga pico después
     )
   ).protocols(httpConf)
    .assertions(
