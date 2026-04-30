@@ -37,7 +37,8 @@ class LoginTest extends Simulation {
       constantConcurrentUsers(100).during(30.seconds)
     ),
     scnPico.inject(
-      rampConcurrentUsers(0).to(200).during(30.seconds)
+      constantConcurrentUsers(0).during(30.seconds),
+      constantConcurrentUsers(200).during(30.seconds)
     )
   ).protocols(httpConf)
    .assertions(
