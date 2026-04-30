@@ -33,17 +33,19 @@ class LoginTest extends Simulation {
   // 3 Load Scenario
   // Ejecutar secuencialmente: primero carga normal, luego carga pico
   setUp(
-    scnNormal.inject(constantConcurrentUsers(100).during(30.seconds)),
+    scnNormal.inject(
+      constantConcurrentUsers(100).during(30.seconds)
+    )
+  ).andThen(
     scnPico.inject(
-      nothingFor(40.seconds),          // esperar que carga normal termine
-      constantConcurrentUsers(200).during(30.seconds) // carga pico después
+      constantConcurrentUsers(200).during(30.seconds)
     )
   ).protocols(httpConf)
    .assertions(
      // Historia 1: ≤ 2 segundos con 100 usuarios concurrentes (carga normal)
-     details("Login Carga Normal").responseTime.percentile3.lte(2000),
+     details("Login Carga Normal").responseTime.percentile(95).lte(2000),
      // Historia 1: ≤ 5 segundos con 200 usuarios concurrentes (carga pico)
-     details("Login Carga Pico").responseTime.percentile3.lte(5000),
+     details("Login Carga Pico").responseTime.percentile(95).lte(5000),
      // Tasa de error global ≤ 1%
      global.failedRequests.percent.lte(1)
    )
