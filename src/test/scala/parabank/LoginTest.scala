@@ -35,11 +35,10 @@ class LoginTest extends Simulation {
   setUp(
     scnNormal.inject(
       constantConcurrentUsers(100).during(30.seconds)
-    )
-  ).andThen(
-    scnPico.inject(
-      constantConcurrentUsers(200).during(30.seconds)
-    )
+    ).andThen(
+      scnPico.inject(
+        constantConcurrentUsers(200).during(30.seconds)
+      )
   ).protocols(httpConf)
    .assertions(
      // Historia 1: ≤ 2 segundos con 100 usuarios concurrentes (carga normal)
