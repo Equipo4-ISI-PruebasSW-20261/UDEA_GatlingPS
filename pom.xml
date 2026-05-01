@@ -7,12 +7,12 @@
   <version>1.0-SNAPSHOT</version>
 
   <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <encoding>UTF-8</encoding>
 
-    <gatling.version>3.3.1</gatling.version>
-    <gatling-maven-plugin.version>3.0.5</gatling-maven-plugin.version>
+    <gatling.version>3.9.5</gatling.version>
+    <gatling-maven-plugin.version>4.9.6</gatling-maven-plugin.version>
   </properties>
 
   <dependencies>
@@ -42,6 +42,18 @@
         <configuration>
           <runMultipleSimulations>true</runMultipleSimulations>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>4.8.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

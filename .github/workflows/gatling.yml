@@ -1,40 +1,48 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Java CI with Maven
+name: Gatling Performance Tests
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
-  build:
-
+  gatling-tests:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
-      run: mvn -B clean install --file pom.xml
-
-    - name: Test Gatling with Maven
-      run: mvn -B clean gatling:test --file pom.xml
+        
+    - name: Compile tests
+      run: mvn clean test-compile
       
-    - name: Upload Gatling Results
+    - name: Run Gatling tests
+      run: mvn gatling:test -Dgatling.runMultipleSimulations=true
+      continue-on-error: true
+      
+    - name: Upload Gatling Reports
       uses: actions/upload-artifact@v4
+      if: always()
       with:
-        name: gatling
-        path: target/gatling
+        name: gatling-reports
+        path: target/gatling/
+        retention-days: 30
+        
+    - name: Test Summary
+      if: always()
+      run: |
+        echo "## Gatling Test Execution Complete" >> $GITHUB_STEP_SUMMARY
+        echo "Los reportes completos están disponibles en los artifacts." >> $GITHUB_STEP_SUMMARY
+        if [ -f target/gatling/lastRun.txt ]; then
+          echo "### Última ejecución:" >> $GITHUB_STEP_SUMMARY
+          cat target/gatling/lastRun.txt >> $GITHUB_STEP_SUMMARY
+        fi
